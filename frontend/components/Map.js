@@ -1,9 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+
 const Map = ({ center }) => {
   const mapContainer = useRef(null);
   const mapInstance = useRef(null);
+  const userControlledCenter = useRef(false);
   const [mountains, setMountains] = useState([]);
 
   useEffect(() => {
@@ -17,7 +20,7 @@ const Map = ({ center }) => {
       mapInstance.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v11',
-        center: [-116.823348, 37.621193], // Default to Southern California
+        center: [-118.215593, 35.105726], // Default to Southern California
         zoom: 6,
       });
     }
@@ -25,14 +28,11 @@ const Map = ({ center }) => {
     mapInstance.current.on('load', () => {
       console.log("Map loaded");
       document.querySelectorAll('.mapboxgl-ctrl-bottom-right, .mapboxgl-ctrl-bottom-left')
-          .forEach(el => el.style.display = 'none');
-    });
-
-    mapInstance.current.on("load", () => {
+        .forEach(el => el.style.display = 'none');
       mapInstance.current.resize();
     });
 
-    fetch('/api/mountains')
+    fetch(`${baseUrl}/api/mountains`)
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -63,8 +63,16 @@ const Map = ({ center }) => {
           .setPopup(
             new mapboxgl.Popup({ offset: 25 })
               .setHTML(`<h3>${mountain.name}</h3>
-                <p>Latitude: ${mountain.latitude}, Longitude: ${mountain.longitude}</p>
-                <p>Weather: ${mountain.weather}</p>`)
+                <p>🌤️ Weather: ${mountain.weather}</p>
+                <p>🌡️ Temperature: ${mountain.temperature}°F</p>
+                <p>❄️ Snow Depth: ${mountain.snowfallCurrent || "0"} inches</p>
+                <p>🌧️ Rain (Last 24h): ${mountain.rainLast24h || "0"} inches</p>
+                <p>🌨️ Snow (Last 24h): ${mountain.snowfallLast24h || "0"} inches</p>
+                <p>🌫️ Visibility: ${mountain.visibility} miles</p>
+                <p>🚗 Chains Required: ${mountain.chainsRequired ? "Yes" : "No"}</p>
+                ${mountain.forecastSnow && mountain.forecastDays ?
+                  `<p>❄️ Snow expected in ${mountain.forecastDays} days</p>` : ''}
+                `)
           )
           .addTo(mapInstance.current);
       } else {
@@ -73,14 +81,19 @@ const Map = ({ center }) => {
     });
   }, [mountains]);
 
-  // Center map when `center` prop updates
   useEffect(() => {
-    if (mapInstance.current && center) {
+    if (mapInstance.current && center && userControlledCenter.current) {
       mapInstance.current.flyTo({
         center: [center.lon, center.lat],
-        zoom: 10,
+        zoom: 8,
         essential: true,
       });
+    }
+  }, [center]);
+
+  useEffect(() => {
+    if (center) {
+      userControlledCenter.current = true;
     }
   }, [center]);
 
