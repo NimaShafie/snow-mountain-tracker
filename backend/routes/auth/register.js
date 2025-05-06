@@ -35,8 +35,8 @@ router.post("/", async (req, res) => {
       [username, password_hash, email, role, false, token]
     );
 
-    // ✅ IMPORTANT: send them directly to backend for cookie setting
-    const verificationLink = `http://localhost:5000/api/auth/verify-token?token=${token}`;
+    // send them directly to backend for cookie setting
+    const verificationLink = `${process.env.BACKEND_BASE_URL}/api/auth/verify-token?token=${token}`;
 
     await transporter.sendMail({
       from: FROM_ADDRESS,

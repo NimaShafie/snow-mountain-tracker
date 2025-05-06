@@ -10,13 +10,13 @@ const mountainsRoutes = require('./routes/mountains');
 const roadClosuresRoutes = require('./routes/roadClosures');
 const reservationsRoutes = require('./routes/reservations');
 const bookingRoutes = require('./routes/booking');
-const authRoutes = require('./routes/auth'); // Updated: centralized all auth routes
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: "http://localhost:5000",
+  origin: process.env.FRONTEND_BASE_URL,
   credentials: true
 }));
 app.use(express.json());
