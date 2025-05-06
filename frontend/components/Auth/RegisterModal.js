@@ -1,5 +1,10 @@
+// frontend/components/Auth/RegisterModal.js
+
 import React, { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Typography, IconButton, Box, Divider } from '@mui/material';
+import {
+  Dialog, DialogTitle, DialogContent, DialogActions,
+  TextField, Button, Typography, IconButton, Box, Divider, InputAdornment
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import EmailIcon from '@mui/icons-material/Email';
@@ -8,54 +13,73 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const RegisterModal = ({ onClose, onSwitchToLogin }) => {
-  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState(null);
+  const [checkingEmail, setCheckingEmail] = useState(false);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    if (e.target.name === 'email') setEmailError(null);
   };
 
-  const validateForm = () => {
+  const checkEmailExists = async () => {
+    if (!formData.email) return;
+    setCheckingEmail(true);
+    try {
+      const res = await axios.get(`http://localhost:5000/api/auth/check-email?email=${encodeURIComponent(formData.email)}`);
+      if (res.data.exists) {
+        setEmailError("Email is already registered.");
+        toast.warn("⚠️ Email is already registered.");
+      } else {
+        setEmailError(null);
+      }
+    } catch (err) {
+      console.error("Email check failed:", err);
+      toast.error("❌ Could not check email.");
+    } finally {
+      setCheckingEmail(false);
+    }
+  };
+
+  const handleRegister = async () => {
     const { name, email, password, confirmPassword } = formData;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
 
     if (!name || !email || !password || !confirmPassword) {
-      toast.error('❌ All fields are required.');
-      return false;
-    }
-
-    if (name.length < 2 || name.length > 30) {
-      toast.error('❌ Name must be between 2 and 30 characters.');
-      return false;
-    }
-
-    if (!emailRegex.test(email)) {
-      toast.error('❌ Please enter a valid email address.');
-      return false;
-    }
-
-    if (!passwordRegex.test(password)) {
-      toast.error('❌ Password does not meet complexity requirements.');
-      return false;
+      toast.error("⚠️ Please fill in all fields.");
+      return;
     }
 
     if (password !== confirmPassword) {
-      toast.error('❌ Passwords do not match.');
-      return false;
+      toast.error("⚠️ Passwords do not match.");
+      return;
     }
 
-    return true;
-  };
-
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
+    if (emailError) {
+      toast.error("⚠️ Resolve email issue before submitting.");
+      return;
+    }
 
     try {
-      await axios.post('/api/auth/register', formData);
-      toast.success('✅ Registered successfully! Please verify your email.');
+      setLoading(true);
+      console.log("📤 Registering user with data:", formData);
+
+      const res = await axios.post('http://localhost:5000/api/auth/register', formData, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      toast.success(res.data.message || "🎉 Registered! Check your inbox.");
       onClose();
     } catch (err) {
-      toast.error(err.response?.data?.message || '❌ Registration failed.');
+      console.error("❌ Registration error:", err);
+      toast.error(err.response?.data?.message || "❌ Internal error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,66 +91,101 @@ const RegisterModal = ({ onClose, onSwitchToLogin }) => {
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      
-      <DialogContent sx={{ paddingTop: '48px !important', paddingX: '32px !important' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px !important' }}>
+
+      <DialogContent sx={{ paddingTop: '48px !important', paddingX: 4 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <TextField
             label="Name"
+            name="name"
+            value={formData.name}
             variant="outlined"
             fullWidth
-            required
-            name="name"
             onChange={handleChange}
-            InputProps={{ startAdornment: <PersonAddIcon sx={{ mr: 1, color: '#1976d2' }} /> }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <PersonAddIcon sx={{ color: '#dc004e' }} />
+                </InputAdornment>
+              )
+            }}
           />
           <TextField
-            label="Email Address"
-            variant="outlined"
-            type="email"
-            fullWidth
-            required
+            label="Email"
             name="email"
+            type="email"
+            value={formData.email}
+            variant="outlined"
+            fullWidth
+            error={!!emailError}
+            helperText={emailError}
+            onBlur={checkEmailExists}
             onChange={handleChange}
-            InputProps={{ startAdornment: <EmailIcon sx={{ mr: 1, color: '#1976d2' }} /> }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <EmailIcon sx={{ color: '#dc004e' }} />
+                </InputAdornment>
+              )
+            }}
           />
           <TextField
             label="Password"
-            variant="outlined"
-            type="password"
-            fullWidth
-            required
             name="password"
+            type="password"
+            value={formData.password}
+            variant="outlined"
+            fullWidth
             onChange={handleChange}
-            InputProps={{ startAdornment: <LockIcon sx={{ mr: 1, color: '#1976d2' }} /> }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon sx={{ color: '#dc004e' }} />
+                </InputAdornment>
+              )
+            }}
           />
           <TextField
             label="Confirm Password"
-            variant="outlined"
-            type="password"
-            fullWidth
-            required
             name="confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            variant="outlined"
+            fullWidth
             onChange={handleChange}
-            InputProps={{ startAdornment: <LockIcon sx={{ mr: 1, color: '#1976d2' }} /> }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <LockIcon sx={{ color: '#dc004e' }} />
+                </InputAdornment>
+              )
+            }}
           />
         </Box>
-        <Typography variant="body2" color="textSecondary" sx={{ mt: 2 }}>
-          Password requirements: at least 8 characters, including uppercase, lowercase, number, and a special symbol.
+
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          Password must be at least 8 characters and include a symbol and number.
         </Typography>
+
         <Divider sx={{ my: 3 }} />
         <Typography variant="body1" align="center">
           Already have an account?
           <Button variant="text" onClick={onSwitchToLogin}>Login</Button>
         </Typography>
       </DialogContent>
-  
+
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={handleSubmit} variant="contained" color="primary" fullWidth size="large">
-          Register
+        <Button
+          onClick={handleRegister}
+          variant="contained"
+          fullWidth
+          size="large"
+          disabled={loading || checkingEmail}
+        >
+          {loading ? "Registering..." : "Register"}
         </Button>
       </DialogActions>
     </Dialog>
-  );  
+  );
 };
 
 export default RegisterModal;

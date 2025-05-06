@@ -8,11 +8,13 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useAuth } from '../../context/AuthContext';
 import { toast } from 'react-toastify';
+import { useNotification } from '../../context/NotificationContext';
 
 const LoginModal = ({ onClose, onSwitchToRegister }) => {
   const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { showSnackbar } = useNotification();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -22,12 +24,35 @@ const LoginModal = ({ onClose, onSwitchToRegister }) => {
 
     try {
       await login(email, password);
-      toast.success('🎉 Successfully logged in!');
-      onClose();
+      showSnackbar("🎉 Successfully logged in!", "success");
+      setTimeout(() => {
+        onClose();
+      }, 600); // delay close to ensure snackbar is visible
     } catch (err) {
-      console.error('[Login error]', err.response?.data || err.message);
-      toast.error('❌ Login failed. Check credentials.');
+      const msg = err?.response?.data?.message;
+      if (msg?.includes("verify")) {
+        toast.warning("Please verify your email.");
+      } else {
+        showSnackbar("❌ Login failed. Check credentials.", "error");
+      }
     }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
+  };
+
+  const handleResend = async () => {
+    if (!email) return toast.info("Enter your email first.");
+    const res = await fetch("/api/auth/resend-verification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    toast.info(data.message || "Verification email resent.");
   };
 
   return (
@@ -38,7 +63,10 @@ const LoginModal = ({ onClose, onSwitchToRegister }) => {
           <CloseIcon />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ paddingTop: '48px !important', paddingX: '32px !important' }}>
+      <DialogContent
+        sx={{ paddingTop: '48px !important', paddingX: '32px !important' }}
+        onKeyDown={handleKeyDown}
+      >
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '24px !important' }}>
           <TextField
             label="Email Address"
@@ -64,6 +92,9 @@ const LoginModal = ({ onClose, onSwitchToRegister }) => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          <Button variant="text" size="small" onClick={handleResend}>
+            🔁 Resend verification email
+          </Button>
         </Box>
         <Divider sx={{ my: 3 }} />
         <Typography variant="body1" align="center">
@@ -72,7 +103,9 @@ const LoginModal = ({ onClose, onSwitchToRegister }) => {
         </Typography>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={handleLogin} variant="contained" fullWidth size="large">Login</Button>
+        <Button onClick={handleLogin} variant="contained" fullWidth size="large">
+          Login
+        </Button>
       </DialogActions>
     </Dialog>
   );
