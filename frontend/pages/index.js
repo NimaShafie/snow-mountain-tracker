@@ -18,6 +18,7 @@ import { useTheme } from "@mui/material/styles";
 import Snowfall from "../components/Snowfall";
 import { useModalStore } from "../store/useModalStore";
 import { useRouter } from "next/router";
+import SearchBarWithAlerts from "../components/SearchBarWithAlerts";
 
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,7 +50,6 @@ const Home = () => {
     const fetchMountains = async () => {
       try {
         const url = `${process.env.NEXT_PUBLIC_API_BASE}/api/mountains`;
-        console.log("Fetching mountains from:", url);
   
         const response = await fetch(url);
         if (!response.ok) throw new Error("Mountains API not found");
@@ -102,8 +102,6 @@ const Home = () => {
       () => alert("Permission denied.")
     );
   };
-
-  console.log("API BASE:", process.env.NEXT_PUBLIC_API_BASE);
 
   const handleMountainHover = (mtn) => {
     if (!lockedMountain || mtn?.name !== lockedMountain?.name) {
@@ -266,23 +264,33 @@ const Home = () => {
           )}
 
           <Box sx={{ flex: 1 }}>
-            <Paper elevation={3} sx={{ backgroundColor: "rgba(255,255,255,0.8)", p: 2, mb: 2, borderRadius: 2, display: "flex", alignItems: "center", gap: 1 }}>
-              <TextField
-                label="🔍 Search by city or zip code"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                fullWidth
-              />
-              <Button onClick={handleSearch} variant="contained" sx={{ height: 56 }}>
-                <SearchIcon /> Search
-              </Button>
-              <IconButton onClick={handleLocateMe} color="primary" sx={{ height: 56 }}>
-                <MyLocationIcon fontSize="large" />
-              </IconButton>
-            </Paper>
-
-            <Box key={mapKey} sx={{ height: "64.8vh", borderRadius: 6, boxShadow: 4, position: "relative" }}>
+          <SearchBarWithAlerts
+            onSearch={(query) => {
+              fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+                .then(res => res.json())
+                .then(data => {
+                  if (data.length > 0) {
+                    const { lat, lon } = data[0];
+                    setMapCenter({ lat: parseFloat(lat), lon: parseFloat(lon) });
+                    setMapKey((prev) => prev + 1);
+                  } else {
+                    alert("Location not found.");
+                  }
+                })
+                .catch(err => console.error("Search error:", err));
+            }}
+            onLocate={() => {
+              if (!navigator.geolocation) return alert("Geolocation not supported.");
+              navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                  setMapCenter({ lat: pos.coords.latitude, lon: pos.coords.longitude });
+                  setMapKey((prev) => prev + 1);
+                },
+                () => alert("Permission denied.")
+              );
+            }}
+          />
+            <Box key={mapKey} sx={{ height: "60.5vh", borderRadius: 1, boxShadow: 8, position: "relative" }}>
               <MountainFilter filters={filters} setFilters={setFilters} />
               <Map
                 center={mapCenter}
@@ -300,7 +308,7 @@ const Home = () => {
             <BookingSystem mountains={mountains} selectedMountain={selectedMountain} />
           </Box>
           <Box sx={{ flex: 1.5 }}>
-            <Paper elevation={3} sx={{ height:"54.5vh", p: 3, borderRadius: 2, backgroundColor: "rgba(255,255,255,0.8)" }}>
+            <Paper elevation={3} sx={{ height:"54.6vh", p: 3, borderRadius: 2, backgroundColor: "rgba(255,255,255,0.8)" }}>
               <Calendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
             </Paper>
           </Box>
