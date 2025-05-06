@@ -41,7 +41,6 @@ NEXT_PUBLIC_API_URL=http://localhost:5000
 PORT=5000
 IPINFO_TOKEN=ipinfo_token_here
 VISUAL_CROSSING_WEATHER_API_KEY=visual_crossing_weather_api_key_here
-REACT_APP_MAPBOX_TOKEN=react_app_mapbox_token_here
 NODE_ENV=development
 DATABASE_ENABLED=false
 MYSQL_HOST=mysql_host_here

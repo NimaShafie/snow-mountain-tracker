@@ -48,16 +48,21 @@ const Home = () => {
   useEffect(() => {
     const fetchMountains = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/mountains`);
+        const url = `${process.env.NEXT_PUBLIC_API_BASE}/api/mountains`;
+        console.log("Fetching mountains from:", url);
+  
+        const response = await fetch(url);
         if (!response.ok) throw new Error("Mountains API not found");
+  
         const data = await response.json();
         setMountains(data);
       } catch (error) {
-        console.error("Error fetching mountain data:", error);
+        console.error("❌ Mountains API error:", error);
       }
     };
+  
     fetchMountains();
-  }, []);
+  }, []);  
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -97,6 +102,8 @@ const Home = () => {
       () => alert("Permission denied.")
     );
   };
+
+  console.log("API BASE:", process.env.NEXT_PUBLIC_API_BASE);
 
   const handleMountainHover = (mtn) => {
     if (!lockedMountain || mtn?.name !== lockedMountain?.name) {

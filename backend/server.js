@@ -1,4 +1,6 @@
-require('dotenv').config();
+require('dotenv').config({
+  path: process.env.NODE_ENV === 'production' ? '.env' : '.env.local'
+});
 require('./jobs/weatherSync');
 
 const express = require('express');
@@ -28,7 +30,7 @@ app.use('/api/mountains', mountainsRoutes);
 app.use('/api/road-closures', roadClosuresRoutes);
 app.use('/api/reservations', reservationsRoutes);
 app.use('/api/booking', bookingRoutes);
-app.use('/api/auth', authRoutes); // ✅ Centralized auth route handling
+app.use('/api/auth', authRoutes);
 
 app.get('/', (req, res) => {
   res.send('Snow Mountain Tracker Backend is running!');
