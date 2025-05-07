@@ -50,19 +50,16 @@ const Home = () => {
     const fetchMountains = async () => {
       try {
         const url = `${process.env.NEXT_PUBLIC_API_BASE}/api/mountains`;
-  
         const response = await fetch(url);
         if (!response.ok) throw new Error("Mountains API not found");
-  
         const data = await response.json();
         setMountains(data);
       } catch (error) {
         console.error("❌ Mountains API error:", error);
       }
     };
-  
     fetchMountains();
-  }, []);  
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -87,16 +84,10 @@ const Home = () => {
   };
 
   const handleLocateMe = () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation not supported.");
-      return;
-    }
+    if (!navigator.geolocation) return alert("Geolocation not supported.");
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setMapCenter({
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude
-        });
+        setMapCenter({ lat: pos.coords.latitude, lon: pos.coords.longitude });
         setMapKey((prev) => prev + 1);
       },
       () => alert("Permission denied.")
@@ -156,14 +147,13 @@ const Home = () => {
   };
 
   return (
-    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", zIndex: 1, overflowX: "hidden", backgroundColor: "transparent", pb: "80px" }}>
+    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", zIndex: 1, overflowX: "hidden", backgroundColor: "transparent", pb: "40px" }}>
       <Snowfall />
       <Head>
         <title>Snow Mountain Tracker</title>
         <link rel="icon" href="/logo/smt-logo.png" />
       </Head>
 
-      {/* Sticky Header */}
       <Box
         component="header"
         sx={{
@@ -188,7 +178,6 @@ const Home = () => {
           🏔️ Snow Mountain Tracker 🏔️
         </Typography>
 
-        {/* Auth controls fixed to the right */}
         <Box sx={{ position: "absolute", right: 24, display: "flex", gap: 1 }}>
           {user ? (
             <>
@@ -210,87 +199,86 @@ const Home = () => {
         </Box>
       </Box>
 
-      <Container maxWidth="xl" sx={{ flex: 1, pt: "85px", pb: "1px" }}>
-        {/* Sidebar + Map */}
-        <Box sx={{ display: "flex", gap: 2 }}>
-          {isMobile ? (
-            <Drawer anchor="left" open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
+      <Container maxWidth="xl" sx={{ flex: 1, pt: "85px", pb: 4 }}>
+        <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 2 }}>
+          <Box sx={{
+            flexBasis: "22%",
+            minWidth: 280,
+            maxWidth: 360,
+            height: "73vh",
+            p: 2,
+            borderRadius: 2,
+            boxShadow: 3,
+            overflow: "hidden",
+            position: "relative",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              width: "120%",
+              height: "120%",
+              transform: "translate(-50%, -50%)",
+              backgroundImage: "url('/logo/smt-logo.png')",
+              backgroundSize: "contain",
+              backgroundRepeat: "no-repeat",
+              backgroundPosition: "center",
+              opacity: 0.3,
+              zIndex: 0
+            }
+          }}>
+            <Box sx={{ zIndex: 1, width: "100%" }}>
               {mountains.length === 0 ? (
-                <Box display="flex" justifyContent="center" alignItems="center" height="300px" p={4}>
+                <Box display="flex" justifyContent="center" alignItems="center" height="100%">
                   <CircularProgress />
                 </Box>
               ) : (
                 <Sidebar
+                  key={lockedMountain?.name || "sidebar"}
                   mountains={mountains}
                   setMapCenter={setMapCenter}
                   hoveredMountain={hoveredMountain}
+                  lockedMountain={lockedMountain}
                   onMountainHover={handleMountainHover}
                   onMountainSelect={handleMountainSelect}
                   onRefresh={handleRefresh}
                   loading={refreshing}
                 />
               )}
-            </Drawer>
-          ) : (
-            <Box sx={{
-              width: "23%", height: "73vh", p: 2, borderRadius: 2, boxShadow: 3, overflow: "hidden", position: "relative",
-              display: "flex", justifyContent: "center", alignItems: "center",
-              "&::before": {
-                content: '""', position: "absolute", top: "50%", left: "50%", width: "120%", height: "120%",
-                transform: "translate(-50%, -50%)", backgroundImage: "url('/logo/smt-logo.png')",
-                backgroundSize: "contain", backgroundRepeat: "no-repeat", backgroundPosition: "center", opacity: 0.3, zIndex: 0
-              }
-            }}>
-              <Box sx={{ zIndex: 1, width: "100%" }}>
-                {mountains.length === 0 ? (
-                  <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-                    <CircularProgress />
-                  </Box>
-                ) : (
-                  <Sidebar
-                    key={lockedMountain?.name || "sidebar"}
-                    mountains={mountains}
-                    setMapCenter={setMapCenter}
-                    hoveredMountain={hoveredMountain}
-                    lockedMountain={lockedMountain}
-                    onMountainHover={handleMountainHover}
-                    onMountainSelect={handleMountainSelect}
-                    onRefresh={handleRefresh}
-                    loading={refreshing}
-                  />
-                )}
-              </Box>
             </Box>
-          )}
+          </Box>
 
-          <Box sx={{ flex: 1 }}>
-          <SearchBarWithAlerts
-            onSearch={(query) => {
-              fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
-                .then(res => res.json())
-                .then(data => {
-                  if (data.length > 0) {
-                    const { lat, lon } = data[0];
-                    setMapCenter({ lat: parseFloat(lat), lon: parseFloat(lon) });
+          <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", minWidth: 700 }}>
+            <SearchBarWithAlerts
+              onSearch={(query) => {
+                fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}`)
+                  .then(res => res.json())
+                  .then(data => {
+                    if (data.length > 0) {
+                      const { lat, lon } = data[0];
+                      setMapCenter({ lat: parseFloat(lat), lon: parseFloat(lon) });
+                      setMapKey((prev) => prev + 1);
+                    } else {
+                      alert("Location not found.");
+                    }
+                  })
+                  .catch(err => console.error("Search error:", err));
+              }}
+              onLocate={() => {
+                if (!navigator.geolocation) return alert("Geolocation not supported.");
+                navigator.geolocation.getCurrentPosition(
+                  (pos) => {
+                    setMapCenter({ lat: pos.coords.latitude, lon: pos.coords.longitude });
                     setMapKey((prev) => prev + 1);
-                  } else {
-                    alert("Location not found.");
-                  }
-                })
-                .catch(err => console.error("Search error:", err));
-            }}
-            onLocate={() => {
-              if (!navigator.geolocation) return alert("Geolocation not supported.");
-              navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                  setMapCenter({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-                  setMapKey((prev) => prev + 1);
-                },
-                () => alert("Permission denied.")
-              );
-            }}
-          />
-            <Box key={mapKey} sx={{ height: "60.5vh", borderRadius: 1, boxShadow: 8, position: "relative" }}>
+                  },
+                  () => alert("Permission denied.")
+                );
+              }}
+            />
+            <Box key={mapKey} sx={{ height: "60vh", borderRadius: 1, boxShadow: 8, position: "relative" }}>
               <MountainFilter filters={filters} setFilters={setFilters} />
               <Map
                 center={mapCenter}
@@ -303,19 +291,17 @@ const Home = () => {
           </Box>
         </Box>
 
-        <Box sx={{ display: "flex", gap: 2, mt: 4 }}>
-          <Box sx={{ flex: 1 }}>
-            <BookingSystem mountains={mountains} selectedMountain={selectedMountain} />
-          </Box>
-          <Box sx={{ flex: 1.5 }}>
-            <Paper elevation={3} sx={{ height:"54.6vh", p: 3, borderRadius: 2, backgroundColor: "rgba(255,255,255,0.8)" }}>
-              <Calendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
-            </Paper>
-          </Box>
-        </Box>
+        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "stretch", gap: 2, mt: 2.5 }}>
+        <Box sx={{ flex: 1 }}>
+        <BookingSystem mountains={mountains} selectedMountain={selectedMountain} />
+      </Box>
+        <Paper elevation={3} sx={{ flex: 1, p: 3, borderRadius: 2, backgroundColor: "rgba(255,255,255,0.8)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+          <Calendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
+        </Paper>
+      </Box>
+      
       </Container>
 
-      {/* Sticky Footer */}
       <Box component="footer" sx={{
         position: "fixed",
         bottom: 0,
@@ -330,7 +316,6 @@ const Home = () => {
         <Typography variant="body2">© {new Date().getFullYear()} Snow Mountain Tracker</Typography>
       </Box>
 
-      {/* Floating Logo */}
       <Box
         component="img"
         src="/logo/smt-logo.png"
@@ -347,7 +332,6 @@ const Home = () => {
         }}
       />
 
-      {/* Modals */}
       {modalType === "login" && <LoginModal onClose={closeModal} onSwitchToRegister={() => openModal("register")} />}
       {modalType === "register" && <RegisterModal onClose={closeModal} onSwitchToLogin={() => openModal("login")} />}
     </Box>
