@@ -33,33 +33,43 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
     mapInstance.current.on("load", () => {
       mapInstance.current.resize();
       setMapReady(true);
-
+    
+      // DEM source for terrain
       mapInstance.current.addSource("terrain-dem", {
         type: "raster-dem",
-        url: "mapbox://mapbox.terrain-rgb",
+        url: "mapbox://mapbox.mapbox-terrain-dem-v1",
         tileSize: 512,
         maxzoom: 14,
       });
-
+    
+      // DEM source for hillshade (separate instance)
       mapInstance.current.addSource("hillshade-dem", {
         type: "raster-dem",
-        url: "mapbox://mapbox.terrain-rgb",
+        url: "mapbox://mapbox.mapbox-terrain-dem-v1",
         tileSize: 512,
         maxzoom: 14,
       });
-
-      mapInstance.current.setTerrain({ source: "terrain-dem", exaggeration: 1.5 });
-
+    
+      // Apply terrain
+      mapInstance.current.setTerrain({
+        source: "terrain-dem",
+        exaggeration: 1.5,
+      });
+    
+      // Hillshade layer using different DEM source
       mapInstance.current.addLayer({
         id: "hillshading",
         source: "hillshade-dem",
         type: "hillshade",
-        paint: { "hillshade-exaggeration": 0.5 },
+        paint: {
+          "hillshade-exaggeration": 0.5,
+        },
       });
-
+    
+      // Hide Mapbox branding
       document.querySelectorAll(".mapboxgl-ctrl-bottom-left, .mapboxgl-ctrl-bottom-right")
         .forEach(el => el.style.display = "none");
-    });
+    });    
   }, []);
 
   useEffect(() => {

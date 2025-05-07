@@ -72,7 +72,7 @@ const SearchBarWithAlerts = ({ onSearch, onLocate }) => {
       {/* Search Block */}
       <Paper elevation={3} sx={{ flex: 1, p: 2, display: "flex", alignItems: "center", gap: 1 }}>
         <TextField
-          label="🔍 Search by city or zip code"
+          label="🔍 Search by city name"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
