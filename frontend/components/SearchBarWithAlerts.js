@@ -37,6 +37,17 @@ const SearchBarWithAlerts = ({ onSearch, onLocate }) => {
   }, []);
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      fetch("/api/road-closures")
+        .then((res) => res.ok ? res.json() : [])
+        .then(setRoadClosures)
+        .catch(() => {});
+    }, 6000); // Check every 6 seconds
+  
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
     if (roadClosures.length <= 2) return;
 
     intervalRef.current = setInterval(() => {

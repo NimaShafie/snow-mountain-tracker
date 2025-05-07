@@ -65,17 +65,45 @@ async function refreshSingleMountain(mountain) {
 }
 
 async function refreshRoadClosures() {
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  const OVERPASS_URL = "https://overpass.kumi.systems/api/interpreter";
-
   try {
     const [mountains] = await db.query("SELECT name, latitude, longitude FROM mountains");
+
+    // 🔁 Inject mock closures in development mode if flag is set
+    if (process.env.USE_MOCK_CLOSURES === "true") {
+      console.warn("⚠️ Using mock closures (USE_MOCK_CLOSURES=true)");
+
+      const mockClosures = [
+        {
+          id: "mock-1",
+          location: "Mock Closure near Big Bear",
+          lat: 34.27,
+          lon: -116.88,
+          status: "Closed",
+          details: "Mocked for development.",
+          source: "https://example.com"
+        },
+        {
+          id: "mock-2",
+          location: "Mock Closure near Mammoth",
+          lat: 37.63,
+          lon: -118.875,
+          status: "Delayed",
+          details: "Testing display of delayed roads.",
+          source: "https://example.com"
+        }
+      ];
+
+      roadClosureCache.setClosures(mockClosures);
+      return;
+    }
+
+    // 🛰️ Live Overpass fetch
     const closures = [];
 
     for (const mtn of mountains) {
       const lat = parseFloat(mtn.latitude);
       const lon = parseFloat(mtn.longitude);
-      const radius = 16000; // 10 miles
+      const radius = 16000;
 
       const query = `
         [out:json];
@@ -87,59 +115,31 @@ async function refreshRoadClosures() {
         out center;
       `;
 
-      try {
-        await sleep(1000); // wait 1s between each Overpass query
-        const res = await axios.post(OVERPASS_URL, `data=${encodeURIComponent(query)}`, {
-          headers: { "Content-Type": "application/x-www-form-urlencoded" }
+      const res = await axios.post("https://overpass-api.de/api/interpreter", `data=${encodeURIComponent(query)}`, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" }
+      });
+
+      for (const el of res.data.elements || []) {
+        if (!el.center || !el.tags) continue;
+
+        closures.push({
+          id: `osm-${el.id}`,
+          location: el.tags.name || `near ${mtn.name}`,
+          lat: el.center.lat,
+          lon: el.center.lon,
+          status: el.tags.construction ? "Construction" : el.tags.disused ? "Disused" : "Closed",
+          details: el.tags.highway ? `Tagged as: ${el.tags.highway}` : "Unknown type",
+          source: `https://openstreetmap.org/way/${el.id}`
         });
 
-        const elements = res.data.elements || [];
-
-        for (const el of elements) {
-          if (!el.center || !el.tags) continue;
-
-          closures.push({
-            id: `osm-${el.id}`,
-            location: el.tags.name || `near ${mtn.name}`,
-            lat: el.center.lat,
-            lon: el.center.lon,
-            status: el.tags.construction
-              ? "Construction"
-              : el.tags.disused
-              ? "Disused"
-              : "Closed",
-            details: el.tags.highway ? `Tagged as: ${el.tags.highway}` : "Unknown type",
-            source: `https://www.openstreetmap.org/way/${el.id}`
-          });
-
-          console.log(`📍 Found closure:`, {
-            location: el.tags.name || `near ${mtn.name}`,
-            lat: el.center.lat,
-            lon: el.center.lon,
-            tags: el.tags
-          });
-        }
-      } catch (innerErr) {
-        console.error(`⚠️ Overpass query failed for ${mtn.name}:`, innerErr.message);
+        console.log("📍 Creating closure marker:", el.tags.name || `near ${mtn.name}`, el.center.lat, el.center.lon);
       }
-    }
-
-    if (closures.length === 0 && process.env.NODE_ENV === "development") {
-      closures.push({
-        id: "dev-1",
-        location: "Test Closure near Big Bear",
-        lat: 34.26,
-        lon: -117.19,
-        status: "Closed",
-        details: "Dev fallback marker for testing",
-        source: "https://openstreetmap.org"
-      });
     }
 
     roadClosureCache.setClosures(closures);
     console.log(`🚦 Synced ${closures.length} closures from Overpass`);
   } catch (err) {
-    console.error("❌ Overpass road closure sync failed:", err.message);
+    console.error("❌ Road closure sync failed:", err.message);
   }
 }
 

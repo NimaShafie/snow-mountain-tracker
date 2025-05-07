@@ -68,13 +68,13 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
       .then(setMountains)
       .catch((err) => console.error("❌ Error fetching mountains:", err));
 
-      fetch(`${baseUrl}/api/road-closures`)
+    fetch(`${baseUrl}/api/road-closures`)
       .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
       .then(data => {
-        console.log("Closures received:", data);
+        console.log("🚧 Closures received:", data);
         setClosures(data);
       })
-      .catch(err => console.error("Road closures fetch failed:", err));    
+      .catch(err => console.error("❌ Road closures fetch failed:", err));
   }, []);
 
   useEffect(() => {
@@ -88,7 +88,7 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
 
     document.querySelectorAll(".mapboxgl-marker").forEach(el => el.remove());
 
-    // Mountain markers
+    // 🏔️ Mountain markers
     mountains.forEach((mountain) => {
       const show =
         (mountain.hasSnow && filters.showHasSnow) ||
@@ -150,10 +150,23 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
         onMountainHover(mountain);
       });
     });
+  }, [mountains, filters, lockedMountain]);
 
-    // Road closure markers
+  useEffect(() => {
+    if (!mapReady || !mapInstance.current) {
+      console.warn("⏳ Map not ready — skipping closure render");
+      return;
+    }
+
+    console.log("🔄 Rendering closures:", closures.length);
+
     closures.forEach((closure) => {
       if (!closure.lat || !closure.lon) return;
+
+      if (!mapInstance.current.loaded()) {
+        console.warn("⚠️ Map not fully loaded. Skipping:", closure.location);
+        return;
+      }
 
       const el = document.createElement("div");
       el.className = "closure-marker";
@@ -164,8 +177,8 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
       el.style.cursor = "pointer";
       el.style.animation = "pulse 1.6s infinite ease-in-out";
       el.style.backgroundImage = `url(/icons/SVG/road_closure.svg)`;
-      
-      // Add fallback style in case SVG fails
+
+      // Fallback
       el.style.backgroundColor = "rgba(255, 100, 100, 0.4)";
       el.style.border = "1px solid red";
       el.style.borderRadius = "50%";
@@ -179,13 +192,13 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
       `;
 
       console.log("📍 Creating closure marker:", closure.location, closure.lat, closure.lon);
+
       new mapboxgl.Marker(el)
         .setLngLat([closure.lon, closure.lat])
         .setPopup(new mapboxgl.Popup({ offset: 20 }).setHTML(html))
         .addTo(mapInstance.current);
     });
-
-  }, [mountains, closures, filters, lockedMountain]);
+  }, [closures, mapReady]);
 
   useEffect(() => {
     if (mapInstance.current && center) {
