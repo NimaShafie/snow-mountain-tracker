@@ -200,19 +200,20 @@ const Home = () => {
       </Box>
 
       <Container maxWidth="xl" sx={{ flex: 1, pt: "85px", pb: 4 }}>
-      <Box sx={{ display: "flex", alignItems: "stretch", justifyContent: "space-between", gap: 2 }}>
-        <Box sx={{
+        <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 2 }}>
+          <Box sx={{
             flexBasis: "22%",
             minWidth: 280,
             maxWidth: 360,
+            height: "calc(60vh + 160px)",
             p: 2,
             borderRadius: 2,
             boxShadow: 3,
             overflow: "hidden",
             position: "relative",
             display: "flex",
-            flexDirection: "column",
             justifyContent: "center",
+            alignItems: "center",
             "&::before": {
               content: '""',
               position: "absolute",
