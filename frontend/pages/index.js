@@ -206,11 +206,10 @@ const Home = () => {
             minWidth: 280,
             maxWidth: 360,
             height: {
-              xs: "calc(60vh + 112px)", // phones, smaller laptops
-              sm: "calc(60vh + 128px)", // mid-range
-              md: "calc(60vh + 144px)", // 1080p
-              lg: "calc(60vh + 160px)", // 1440p+
-              xl: "calc(60vh + 160px)" // 4K
+              xs: "calc(60vh + 160px)",
+              "@media (max-width:1920px)": {
+                height: "calc(60vh + 195px)"
+              }
             },
             p: 2,
             borderRadius: 2,
