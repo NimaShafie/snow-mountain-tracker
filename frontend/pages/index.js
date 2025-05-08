@@ -206,11 +206,11 @@ const Home = () => {
             minWidth: 280,
             maxWidth: 360,
             height: {
-              xs: "calc(60vh + 112px)",
-              sm: "calc(60vh + 128px)",
-              md: "calc(60vh + 144px)",
-              lg: "calc(60vh + 160px)",
-              xl: "calc(60vh + 160px)",
+              xs: "calc(60vh + 112px)", // phones, smaller laptops
+              sm: "calc(60vh + 128px)", // mid-range
+              md: "calc(60vh + 144px)", // 1080p
+              lg: "calc(60vh + 160px)", // 1440p+
+              xl: "calc(60vh + 160px)" // 4K
             },
             p: 2,
             borderRadius: 2,
@@ -284,7 +284,7 @@ const Home = () => {
                 );
               }}
             />
-            <Box key={mapKey} sx={{ height: "60vh", borderRadius: 1, boxShadow: 8, position: "relative" }}>
+            <Box key={mapKey} sx={{ height: "calc(60vh)", borderRadius: 1, boxShadow: 8, position: "relative" }}>
               <MountainFilter filters={filters} setFilters={setFilters} />
               <Map
                 center={mapCenter}
