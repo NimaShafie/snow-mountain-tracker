@@ -1,3 +1,4 @@
+const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 console.log("✅ register.js loaded — BACKEND_BASE_URL =", process.env.BACKEND_BASE_URL);
