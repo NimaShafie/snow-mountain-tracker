@@ -36,7 +36,8 @@ router.post("/", async (req, res) => {
     );
 
     // send them directly to backend for cookie setting
-    const verificationLink = `${process.env.BACKEND_BASE_URL}/api/auth/verify-token?token=${token}`;
+   const backendBase = process.env.BACKEND_BASE_URL || "http://localhost:3001";
+   const verificationLink = `${backendBase}/auth/verify-token?token=${token}`;
 
     await transporter.sendMail({
       from: FROM_ADDRESS,
