@@ -5,6 +5,8 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const transporter = require("../../utils/mailer");
 
+require('dotenv').config();
+
 const FROM_ADDRESS = `"SnowMT Team" <no.reply.at.snow.mountain.tracker@gmail.com>`;
 
 router.post("/", async (req, res) => {
@@ -37,7 +39,7 @@ router.post("/", async (req, res) => {
 
     // send them directly to backend for cookie setting
    const backendBase = process.env.BACKEND_BASE_URL || "http://localhost:3001";
-   const verificationLink = `${backendBase}/auth/verify-token?token=${token}`;
+   const verificationLink = `${backendBase.replace(/\/+$/, "")}/auth/verify-token?token=${token}`;
 
     await transporter.sendMail({
       from: FROM_ADDRESS,
