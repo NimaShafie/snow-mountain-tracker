@@ -6,6 +6,28 @@ const cache = new NodeCache({ stdTTL: 900 });
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 const apiKey = process.env.VISUAL_CROSSING_WEATHER_API_KEY;
 
+router.post('/refresh-one', async (req, res) => {
+  const { name } = req.query;
+  if (!name) return res.status(400).json({ message: "Missing name" });
+
+  try {
+    // 🔍 Lookup full mountain object from DB
+    const [rows] = await db.query("SELECT * FROM mountains WHERE name = ?", [name]);
+    if (!rows.length) return res.status(404).json({ message: "Mountain not found" });
+
+    const mountain = rows[0];
+
+    // 🔄 Refresh this specific mountain
+    await weatherSync.refreshSingleMountain(mountain);
+
+    res.json({ message: "Mountain updated", name });
+  } catch (err) {
+    console.error("❌ Error refreshing single mountain:", err.message);
+    res.status(500).json({ error: "Failed to refresh mountain" });
+  }
+});
+
+
 exports.getMountains = async (req, res) => {
   try {
     // First, check if mountain records exist in DB
