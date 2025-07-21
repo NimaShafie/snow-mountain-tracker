@@ -127,7 +127,7 @@ const Home = () => {
   const handleRefresh = async () => {
     try {
       setRefreshing(true);
-      const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE}/mountains/refresh", { method: "POST" });
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/mountains/refresh`, { method: "POST" });
       if (!res.ok) throw new Error("Refresh failed");
 
       const updated = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/mountains`);
@@ -154,6 +154,7 @@ const Home = () => {
         <link rel="icon" href="/logo/smt-logo.png" />
       </Head>
 
+      {/* HEADER */}
       <Box
         component="header"
         sx={{
@@ -199,6 +200,7 @@ const Home = () => {
         </Box>
       </Box>
 
+      {/* MAIN LAYOUT */}
       <Container maxWidth="xl" sx={{ flex: 1, pt: "85px", pb: 4 }}>
         <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 2 }}>
           <Box sx={{
@@ -256,6 +258,7 @@ const Home = () => {
             </Box>
           </Box>
 
+          {/* MAP AND FILTER */}
           <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", minWidth: 700 }}>
             <SearchBarWithAlerts
               onSearch={(query) => {
@@ -272,16 +275,7 @@ const Home = () => {
                   })
                   .catch(err => console.error("Search error:", err));
               }}
-              onLocate={() => {
-                if (!navigator.geolocation) return alert("Geolocation not supported.");
-                navigator.geolocation.getCurrentPosition(
-                  (pos) => {
-                    setMapCenter({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-                    setMapKey((prev) => prev + 1);
-                  },
-                  () => alert("Permission denied.")
-                );
-              }}
+              onLocate={handleLocateMe}
             />
             <Box key={mapKey} sx={{ height: "calc(60vh)", borderRadius: 1, boxShadow: 8, position: "relative" }}>
               <MountainFilter filters={filters} setFilters={setFilters} />
@@ -296,17 +290,26 @@ const Home = () => {
           </Box>
         </Box>
 
+        {/* BOOKING & CALENDAR */}
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "stretch", gap: 2, mt: 2.5 }}>
-        <Box sx={{ flex: 1 }}>
-        <BookingSystem mountains={mountains} selectedMountain={selectedMountain} />
-      </Box>
-        <Paper elevation={3} sx={{ flex: 1, p: 3, borderRadius: 2, backgroundColor: "rgba(255,255,255,0.8)", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-          <Calendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
-        </Paper>
-      </Box>
-      
+          <Box sx={{ flex: 1 }}>
+            <BookingSystem mountains={mountains} selectedMountain={selectedMountain} />
+          </Box>
+          <Paper elevation={3} sx={{
+            flex: 1,
+            p: 3,
+            borderRadius: 2,
+            backgroundColor: "rgba(255,255,255,0.8)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between"
+          }}>
+            <Calendar selectedDate={selectedDate} onDateChange={setSelectedDate} />
+          </Paper>
+        </Box>
       </Container>
 
+      {/* FOOTER & WATERMARK */}
       <Box component="footer" sx={{
         position: "fixed",
         bottom: 0,
