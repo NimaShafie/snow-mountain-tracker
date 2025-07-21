@@ -20,7 +20,7 @@ export default function MyApp({ Component, pageProps }) {
             async
             defer
             data-website-id="2f1331ac-2d82-4bac-af73-6eff5315c274"
-            src="https://smtracker.duckdns.org:444/script.js"
+            src="https://smtracker.shafie.org:444/script.js"
             strategy="afterInteractive"
           />
           <Component {...pageProps} />
