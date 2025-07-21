@@ -31,8 +31,8 @@ router.post("/", async (req, res) => {
     const refreshToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
 
     res.setHeader("Set-Cookie", [
-      `token=${accessToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=900; Domain=${process.env.COOKIE_DOMAIN}`,
-      `refreshToken=${refreshToken}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=604800; Domain=${process.env.COOKIE_DOMAIN}`
+      `token=${accessToken}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=900; Domain=smtracker.shafie.org`,
+      `refreshToken=${refreshToken}; Path=/; HttpOnly; Secure; SameSite=None; Max-Age=604800; Domain=smtracker.shafie.org`
     ]);
 
     res.status(200).json({

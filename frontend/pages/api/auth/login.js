@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   // Example static check (for testing)
   if (email === 'test@example.com' && password === 'password') {
     // Set mock session token
-    res.setHeader('Set-Cookie', 'token=example-token; Path=/; HttpOnly; Secure; SameSite=Lax, Domain=${process.env.COOKIE_DOMAIN}');
+    res.setHeader('Set-Cookie', 'token=example-token; Path=/; HttpOnly; Secure; SameSite=Lax, Domain=smtracker.shafie.org');
     return res.status(200).json({ message: 'Logged in', user: { name: 'Test User', email } });
   }
 

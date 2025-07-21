@@ -85,6 +85,11 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
       });
     }
 
+    if (!mapInstance.current || !mapContainer.current) {
+      console.warn("⚠️ Map not ready - skipping marker render");
+      return;
+    }
+
     document.querySelectorAll(".mapboxgl-marker").forEach(el => el.remove());
 
     mountains.forEach((mountain) => {
@@ -151,7 +156,10 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
   }, [mountains, filters, lockedMountain]);
 
   useEffect(() => {
-    if (!mapReady || !mapInstance.current) return;
+    if (!mapReady || !mapInstance.current) {
+      console.warn("⏳ Map not ready — skipping closure render");
+      return;
+    }
 
     closures.forEach((closure) => {
       if (!closure.lat || !closure.lon || !mapInstance.current.loaded()) return;
@@ -193,6 +201,11 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
       });
     }
   }, [center]);
+
+  if (!mapContainer.current) {
+    console.warn("❌ mapContainer is null — rendering skipped");
+    return null;
+  }
 
   return <div ref={mapContainer} style={{ width: "100%", height: "81.3%" }} />;
 };
