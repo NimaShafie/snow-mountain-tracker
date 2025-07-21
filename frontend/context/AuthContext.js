@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     const fetchUser = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/me`, {
-          credentials: "include" // ensure cookies are sent with request
+          credentials: "include"
         });
         if (res.ok) {
           const data = await res.json();
@@ -32,12 +32,16 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const res = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE}/auth/login`, { email, password });
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE}/auth/login`,
+      { email, password },
+      { withCredentials: true }
+    );
     setUser(res.data.user);
   };
 
   const logout = async () => {
-    await fetch("/auth/logout", {
+    await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/logout`, {
       method: "POST",
       credentials: "include"
     });
