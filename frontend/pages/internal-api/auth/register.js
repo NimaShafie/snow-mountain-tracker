@@ -5,7 +5,7 @@ export default async function handler(req, res) {
 
   try {
     const backendUrl = process.env.NEXT_PUBLIC_API_BASE;
-    const response = await axios.post(`${backendUrl}/api/auth/register`, req.body);
+    const response = await axios.post(`${backendUrl}/internal-api/auth/register`, req.body);
     res.status(response.status).json(response.data);
   } catch (err) {
     const status = err.response?.status || 500;
