@@ -1,4 +1,4 @@
-// frontend/pages/internal-api/auth/verify-token.js
+// frontend/pages/api/auth/verify-token.js
 import axios from "axios";
 
 export default async function handler(req, res) {
@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
   try {
     const backendUrl = process.env.NEXT_PUBLIC_API_BASE;
-    const response = await axios.get(`${backend}/internal-api/auth/verify?token=${token}`, {
+    const response = await axios.get(`${backend}/api/auth/verify?token=${token}`, {
       withCredentials: true
     });
 
