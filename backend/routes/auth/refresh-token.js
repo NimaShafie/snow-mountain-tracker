@@ -14,7 +14,7 @@ router.post("/", (req, res) => {
       role: payload.role
     }, process.env.JWT_SECRET, { expiresIn: "15m" });
 
-    res.setHeader("Set-Cookie", `token=${accessToken}; Path=/; HttpOnly; Max-Age=900; SameSite=Strict`);
+    res.setHeader("Set-Cookie", `token=${accessToken}; Path=/; HttpOnly; Max-Age=900; SameSite=Lax`);
     res.status(200).json({ message: "Refreshed" });
   } catch (err) {
     res.status(401).json({ message: "Invalid refresh token" });
