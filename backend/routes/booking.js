@@ -4,7 +4,7 @@ const router = express.Router();
 const db = require("../models/database");
 const bookingController = require("../controllers/bookingController");
 
-// POST /api/booking — create booking and prevent duplicates
+// POST /booking — create booking and prevent duplicates
 router.post("/", async (req, res) => {
   const { user_id, lift_id, reservation_date, slot } = req.body;
 
@@ -41,7 +41,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// GET /api/booking/availability
+// GET /booking/availability
 router.get("/availability", async (req, res) => {
   const { lift_id, reservation_date } = req.query;
   const MAX = 100;
@@ -74,7 +74,7 @@ router.get("/availability", async (req, res) => {
   }
 });
 
-// GET /api/booking/user/:user_id
+// GET /booking/user/:user_id
 router.get("/user/:user_id", async (req, res) => {
   const { user_id } = req.params;
   try {
@@ -92,7 +92,7 @@ router.get("/user/:user_id", async (req, res) => {
   }
 });
 
-// POST /api/booking/cancel/:booking_id
+// POST /booking/cancel/:booking_id
 router.post("/cancel/:booking_id", async (req, res) => {
   const { booking_id } = req.params;
   try {

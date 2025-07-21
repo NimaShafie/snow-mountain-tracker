@@ -40,7 +40,7 @@ const BookingSystem = ({ mountains = [], selectedMountain }) => {
 
     const checkAvailability = async () => {
       try {
-        const res = await axios.get("/api/booking/availability", {
+        const res = await axios.get("/booking/availability", {
           params: {
             lift_id: formData.mountain,
             reservation_date: selectedDate.format("YYYY-MM-DD")
@@ -76,7 +76,7 @@ const BookingSystem = ({ mountains = [], selectedMountain }) => {
     if (availability[slot] < formData.ticketCount) return toast.error("Not enough spots left.");
 
     try {
-      const response = await axios.post("/api/booking", {
+      const response = await axios.post("/booking", {
         user_id: user.user_id,
         lift_id: formData.mountain,
         reservation_date: selectedDate.format("YYYY-MM-DD"),

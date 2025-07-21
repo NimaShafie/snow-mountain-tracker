@@ -11,7 +11,7 @@ const UpcomingBookings = () => {
     if (!user) return;
     const fetchBookings = async () => {
       try {
-        const res = await fetch(`/api/bookings/user/${user.user_id}`);
+        const res = await fetch(`/bookings/user/${user.user_id}`);
         const data = await res.json();
         setBookings(data);
       } catch (err) {

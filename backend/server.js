@@ -26,12 +26,12 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Mount routes
-app.use('/api/location', locationRoutes);
-app.use('/api/mountains', mountainsRoutes);
-app.use('/api/road-closures', roadClosuresRoutes);
-app.use('/api/reservations', reservationsRoutes);
-app.use('/api/booking', bookingRoutes);
-app.use('/api/auth', authRoutes);
+app.use('/location', locationRoutes);
+app.use('/mountains', mountainsRoutes);
+app.use('/road-closures', roadClosuresRoutes);
+app.use('/reservations', reservationsRoutes);
+app.use('/booking', bookingRoutes);
+app.use('/auth', authRoutes);
 
 app.get('/', (req, res) => {
   res.send('Snow Mountain Tracker Backend is running!');

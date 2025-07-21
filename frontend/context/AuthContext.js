@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/auth/me", {
+        const res = await fetch("/auth/me", {
           credentials: "include" // ensure cookies are sent with request
         });
         if (res.ok) {
@@ -32,12 +32,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const res = await axios.post("/api/auth/login", { email, password });
+    const res = await axios.post("/auth/login", { email, password });
     setUser(res.data.user);
   };
 
   const logout = async () => {
-    await fetch("/api/auth/logout", {
+    await fetch("/auth/logout", {
       method: "POST",
       credentials: "include"
     });

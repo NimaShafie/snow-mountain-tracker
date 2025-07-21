@@ -23,9 +23,9 @@ export default function VerifyPage() {
       const statusParam = query.get("status");
 
       try {
-        // ✅ Step 1: Try /api/auth/verify-token if token is present
+        // ✅ Step 1: Try /auth/verify-token if token is present
         if (token) {
-          const res = await fetch(`/api/auth/verify-token?token=${token}`, {
+          const res = await fetch(`/auth/verify-token?token=${token}`, {
             method: "GET",
             credentials: "include",
           });
@@ -39,8 +39,8 @@ export default function VerifyPage() {
           }
         }
 
-        // ✅ Step 2: Try /api/auth/me to see if we’re logged in
-        const me = await fetch("/api/auth/me", {
+        // ✅ Step 2: Try /auth/me to see if we’re logged in
+        const me = await fetch("/auth/me", {
           method: "GET",
           credentials: "include",
         });

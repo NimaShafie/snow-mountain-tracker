@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 
 router.get("/", async (req, res) => {
   const { token } = req.query;
-  console.log("🔍 Hit /api/auth/verify-token with token:", token);
+  console.log("🔍 Hit /auth/verify-token with token:", token);
 
   if (!token) {
     console.warn("❌ No token provided");

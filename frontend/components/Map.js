@@ -73,12 +73,12 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
   }, []);
 
   useEffect(() => {
-    fetch(`${baseUrl}/api/mountains`)
+    fetch(`${baseUrl}/mountains`)
       .then((res) => res.ok ? res.json() : Promise.reject(res.statusText))
       .then(setMountains)
       .catch((err) => console.error("❌ Error fetching mountains:", err));
 
-    fetch(`${baseUrl}/api/road-closures`)
+    fetch(`${baseUrl}/road-closures`)
       .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
       .then(data => {
         console.log("🚧 Closures received:", data);

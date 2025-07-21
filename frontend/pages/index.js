@@ -49,7 +49,7 @@ const Home = () => {
   useEffect(() => {
     const fetchMountains = async () => {
       try {
-        const url = `${process.env.NEXT_PUBLIC_API_BASE}/api/mountains`;
+        const url = `${process.env.NEXT_PUBLIC_API_BASE}/mountains`;
         const response = await fetch(url);
         if (!response.ok) throw new Error("Mountains API not found");
         const data = await response.json();
@@ -127,10 +127,10 @@ const Home = () => {
   const handleRefresh = async () => {
     try {
       setRefreshing(true);
-      const res = await fetch("/api/mountains/refresh", { method: "POST" });
+      const res = await fetch("/mountains/refresh", { method: "POST" });
       if (!res.ok) throw new Error("Refresh failed");
 
-      const updated = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/mountains`);
+      const updated = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/mountains`);
       const data = await updated.json();
       setMountains(data);
     } catch (err) {

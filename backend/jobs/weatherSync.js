@@ -115,7 +115,7 @@ async function refreshRoadClosures() {
         out center;
       `;
 
-      const res = await axios.post("https://overpass-api.de/api/interpreter", `data=${encodeURIComponent(query)}`, {
+      const res = await axios.post("https://overpass-api.de/interpreter", `data=${encodeURIComponent(query)}`, {
         headers: { "Content-Type": "application/x-www-form-urlencoded" }
       });
 

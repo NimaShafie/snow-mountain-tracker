@@ -56,10 +56,10 @@ const Sidebar = ({
 
     for (const mtn of mountains) {
       try {
-        await fetch(`/api/mountains/refresh-one?name=${encodeURIComponent(mtn.name)}`, {
+        await fetch(`/mountains/refresh-one?name=${encodeURIComponent(mtn.name)}`, {
           method: "POST"
         });
-        const reload = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/api/mountains`);
+        const reload = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/mountains`);
         const data = await reload.json();
         const latest = data.find(x => x.name === mtn.name);
         if (latest) updated.push(latest);

@@ -1,7 +1,7 @@
-// frontend/pages/api/mountains.js
+// frontend/pages/mountains.js
 export default async function handler(req, res) {
     try {
-      const response = await fetch(`${process.env.API_BASE_URL}/api/mountains`);
+      const response = await fetch(`${process.env.API_BASE_URL}/mountains`);
       const data = await response.json();
       res.status(200).json(data);
     } catch (error) {
