@@ -40,7 +40,7 @@ export default function VerifyPage() {
         }
 
         // ✅ Step 2: Try /auth/me to see if we’re logged in
-        const me = await fetch("${process.env.NEXT_PUBLIC_API_BASE}/auth/me", {
+        const me = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/me`, {
           method: "GET",
           credentials: "include",
         });

@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE}/auth/me", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/me`, {
           credentials: "include" // ensure cookies are sent with request
         });
         if (res.ok) {
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const res = await axios.post("${process.env.NEXT_PUBLIC_API_BASE}/auth/login", { email, password });
+    const res = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE}/auth/login`, { email, password });
     setUser(res.data.user);
   };
 

@@ -23,7 +23,7 @@ const SearchBarWithAlerts = ({ onSearch, onLocate }) => {
     const fetchClosures = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/road-closures");
+        const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE}/road-closures");
         const data = await res.json();
         setRoadClosures(data);
       } catch (err) {
@@ -38,7 +38,7 @@ const SearchBarWithAlerts = ({ onSearch, onLocate }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch("/road-closures")
+      fetch("${process.env.NEXT_PUBLIC_API_BASE}/road-closures")
         .then((res) => res.ok ? res.json() : [])
         .then(setRoadClosures)
         .catch(() => {});

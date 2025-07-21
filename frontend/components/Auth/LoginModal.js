@@ -46,7 +46,7 @@ const LoginModal = ({ onClose, onSwitchToRegister }) => {
 
   const handleResend = async () => {
     if (!email) return toast.info("Enter your email first.");
-    const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE}/auth/resend-verification", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/resend-verification`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email })
