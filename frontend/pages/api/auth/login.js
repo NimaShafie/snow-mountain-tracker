@@ -3,15 +3,13 @@ import axios from 'axios';
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
-  try {
-    const backendUrl = process.env.NEXT_PUBLIC_API_BASE;
-    const response = await axios.post(`${backendUrl}/auth/login`, req.body, {
-      withCredentials: true
-    });
-    res.status(response.status).json(response.data);
-  } catch (error) {
-    const status = error.response?.status || 500;
-    const message = error.response?.data?.message || "Internal login error";
-    res.status(status).json({ message });
+  const { email, password } = req.body;
+
+  // Example static check — replace with real DB check
+  if (email === 'test@example.com' && password === 'password') {
+    res.setHeader('Set-Cookie', `token=example-token; Path=/; HttpOnly; Secure; SameSite=Lax`);
+    return res.status(200).json({ message: 'Logged in' });
   }
+
+  return res.status(401).json({ message: 'Invalid credentials' });
 }
