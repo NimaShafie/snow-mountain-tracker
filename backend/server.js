@@ -17,6 +17,7 @@ const authRoutes = require('./routes/auth');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.set('trust proxy', 1); // required when behind proxy or Cloudflare Tunnel
 app.use(cors({
   origin: process.env.FRONTEND_BASE_URL,
   credentials: true

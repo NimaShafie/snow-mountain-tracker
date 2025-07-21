@@ -24,11 +24,11 @@ router.get("/", async (req, res) => {
     }
 
     const user = users[0];
-    console.log("✅ Found user:", user.user_id, user.email);
+    console.log("✅ Found user:", user.id, user.email);
 
     const [result] = await db.query(
-      "UPDATE users SET email_verified = TRUE, email_verification_token = NULL WHERE user_id = ?",
-      [user.user_id]
+      "UPDATE users SET email_verified = TRUE, email_verification_token = NULL WHERE id = ?",
+      [user.id]
     );
 
     console.log("✅ UPDATE result:", result);
@@ -39,9 +39,9 @@ router.get("/", async (req, res) => {
     }
 
     const payload = {
-      user_id: user.user_id,
+      user_id: user.id,
       email: user.email,
-      role: user.role,
+      role: user.role || 'user',
       email_verified: true,
     };
 
