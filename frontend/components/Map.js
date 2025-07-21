@@ -16,7 +16,7 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
   const US_BOUNDS = [[-140, 10], [-50, 72]];
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_MAPBOX_API_KEY || mapInstance.current) return;
+    if (!process.env.NEXT_PUBLIC_MAPBOX_API_KEY || mapInstance.current || !mapContainer.current) return;
 
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
 
@@ -33,30 +33,23 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
     mapInstance.current.on("load", () => {
       mapInstance.current.resize();
       setMapReady(true);
-    
-      // DEM source for terrain
+
       mapInstance.current.addSource("terrain-dem", {
         type: "raster-dem",
         url: "mapbox://mapbox.mapbox-terrain-dem-v1",
         tileSize: 512,
         maxzoom: 14,
       });
-    
-      // DEM source for hillshade (separate instance)
+
       mapInstance.current.addSource("hillshade-dem", {
         type: "raster-dem",
         url: "mapbox://mapbox.mapbox-terrain-dem-v1",
         tileSize: 512,
         maxzoom: 14,
       });
-    
-      // Apply terrain
-      mapInstance.current.setTerrain({
-        source: "terrain-dem",
-        exaggeration: 1.5,
-      });
-    
-      // Hillshade layer using different DEM source
+
+      mapInstance.current.setTerrain({ source: "terrain-dem", exaggeration: 1.5 });
+
       mapInstance.current.addLayer({
         id: "hillshading",
         source: "hillshade-dem",
@@ -65,25 +58,21 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
           "hillshade-exaggeration": 0.5,
         },
       });
-    
-      // Hide Mapbox branding
+
       document.querySelectorAll(".mapboxgl-ctrl-bottom-left, .mapboxgl-ctrl-bottom-right")
         .forEach(el => el.style.display = "none");
-    });    
+    });
   }, []);
 
   useEffect(() => {
     fetch(`${baseUrl}/mountains`)
-      .then((res) => res.ok ? res.json() : Promise.reject(res.statusText))
+      .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
       .then(setMountains)
-      .catch((err) => console.error("❌ Error fetching mountains:", err));
+      .catch(err => console.error("❌ Error fetching mountains:", err));
 
     fetch(`${baseUrl}/road-closures`)
       .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
-      .then(data => {
-        console.log("🚧 Closures received:", data);
-        setClosures(data);
-      })
+      .then(setClosures)
       .catch(err => console.error("❌ Road closures fetch failed:", err));
   }, []);
 
@@ -98,7 +87,6 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
 
     document.querySelectorAll(".mapboxgl-marker").forEach(el => el.remove());
 
-    // 🏔️ Mountain markers
     mountains.forEach((mountain) => {
       const show =
         (mountain.hasSnow && filters.showHasSnow) ||
@@ -163,20 +151,10 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
   }, [mountains, filters, lockedMountain]);
 
   useEffect(() => {
-    if (!mapReady || !mapInstance.current) {
-      console.warn("⏳ Map not ready — skipping closure render");
-      return;
-    }
-
-    console.log("🔄 Rendering closures:", closures.length);
+    if (!mapReady || !mapInstance.current) return;
 
     closures.forEach((closure) => {
-      if (!closure.lat || !closure.lon) return;
-
-      if (!mapInstance.current.loaded()) {
-        console.warn("⚠️ Map not fully loaded. Skipping:", closure.location);
-        return;
-      }
+      if (!closure.lat || !closure.lon || !mapInstance.current.loaded()) return;
 
       const el = document.createElement("div");
       el.className = "closure-marker";
@@ -187,8 +165,6 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
       el.style.cursor = "pointer";
       el.style.animation = "pulse 1.6s infinite ease-in-out";
       el.style.backgroundImage = `url(/icons/SVG/road_closure.svg)`;
-
-      // Fallback
       el.style.backgroundColor = "rgba(255, 100, 100, 0.4)";
       el.style.border = "1px solid red";
       el.style.borderRadius = "50%";
@@ -200,8 +176,6 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
           <a href="${closure.source}" target="_blank" style="color: #1976d2; text-decoration: underline;">View Source</a>
         </div>
       `;
-
-      console.log("📍 Creating closure marker:", closure.location, closure.lat, closure.lon);
 
       new mapboxgl.Marker(el)
         .setLngLat([closure.lon, closure.lat])

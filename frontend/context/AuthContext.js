@@ -1,5 +1,3 @@
-// frontend/context/AuthContext.js
-
 import { createContext, useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useModalStore } from "../store/useModalStore";
@@ -11,6 +9,8 @@ export const AuthProvider = ({ children }) => {
   const { openModal } = useModalStore();
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const fetchUser = async () => {
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/me`, {
@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
         });
         if (res.ok) {
           const data = await res.json();
-          setUser(data.user);
+          setUser(data?.user || null);
         } else {
           setUser(null);
         }
@@ -32,12 +32,17 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const res = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE}/auth/login`,
-      { email, password },
-      { withCredentials: true }
-    );
-    setUser(res.data.user);
+    try {
+      const res = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_BASE}/auth/login`,
+        { email, password },
+        { withCredentials: true }
+      );
+      setUser(res.data.user);
+    } catch (err) {
+      console.error("Login failed:", err.response?.data || err.message);
+      throw err;
+    }
   };
 
   const logout = async () => {

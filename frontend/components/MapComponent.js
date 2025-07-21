@@ -8,7 +8,8 @@ const MapComponent = ({ center, markers }) => {
   const map = useRef(null);
 
   useEffect(() => {
-    if (!mapContainer.current) return;
+    if (!mapContainer.current || !center) return;
+
     if (map.current) {
       map.current.setCenter([center.lon, center.lat]);
       return;
