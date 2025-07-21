@@ -56,7 +56,7 @@ const Sidebar = ({
 
     for (const mtn of mountains) {
       try {
-        await fetch(`/mountains/refresh-one?name=${encodeURIComponent(mtn.name)}`, {
+        await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/mountains/refresh-one?name=${encodeURIComponent(mtn.name)}`, {
           method: "POST"
         });
         const reload = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/mountains`);

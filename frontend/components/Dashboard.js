@@ -53,7 +53,7 @@ const Dashboard = () => {
   const fetchBookings = async () => {
     if (!user) return;
     try {
-      const res = await axios.get(`/booking/user/${user.user_id}`);
+      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE}/booking/user/${user.user_id}`);
       setBookings(res.data || []);
     } catch (err) {
       console.error("Failed to fetch user bookings", err);
@@ -85,7 +85,7 @@ const Dashboard = () => {
 
   const handleCancel = async (bookingId) => {
     try {
-      await axios.post(`/booking/cancel/${bookingId}`);
+      await axios.post(`${process.env.NEXT_PUBLIC_API_BASE}/booking/cancel/${bookingId}`);
       await fetchBookings();
     } catch (err) {
       console.error("Cancel failed", err);

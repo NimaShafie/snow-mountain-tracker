@@ -127,7 +127,7 @@ const Home = () => {
   const handleRefresh = async () => {
     try {
       setRefreshing(true);
-      const res = await fetch("/mountains/refresh", { method: "POST" });
+      const res = await fetch("${process.env.NEXT_PUBLIC_API_BASE}/mountains/refresh", { method: "POST" });
       if (!res.ok) throw new Error("Refresh failed");
 
       const updated = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/mountains`);

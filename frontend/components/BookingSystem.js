@@ -40,7 +40,7 @@ const BookingSystem = ({ mountains = [], selectedMountain }) => {
 
     const checkAvailability = async () => {
       try {
-        const res = await axios.get("/booking/availability", {
+        const res = await axios.get("${process.env.NEXT_PUBLIC_API_BASE}/booking/availability", {
           params: {
             lift_id: formData.mountain,
             reservation_date: selectedDate.format("YYYY-MM-DD")
