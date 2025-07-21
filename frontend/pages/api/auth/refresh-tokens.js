@@ -16,7 +16,7 @@ export default function handler(req, res) {
       role: payload.role
     }, process.env.JWT_SECRET, { expiresIn: '15m' });
 
-    res.setHeader("Set-Cookie", `token=${newToken}; Path=/; HttpOnly; SameSite=Strict`);
+    res.setHeader("Set-Cookie", `token=${newToken}; Path=/; HttpOnly; SameSite=Lax");
     res.status(200).json({ message: "Token refreshed" });
   } catch (err) {
     res.status(401).json({ message: "Invalid refresh token" });

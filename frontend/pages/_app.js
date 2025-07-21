@@ -15,15 +15,17 @@ export default function MyApp({ Component, pageProps }) {
       <AuthProvider>
         <NotificationProvider>
           <CssBaseline />
-          {/* ✅ Umami Analytics Script */}
-          <Script
+          {/* ✅ Umami Analytics Script * (commented out for now) */}
+          {/*<Script
             async
             defer
             data-website-id="2f1331ac-2d82-4bac-af73-6eff5315c274"
             src="https://smtracker.shafie.org:444/script.js"
             strategy="afterInteractive"
-          />
-          <Component {...pageProps} />
+          />*/}
+          <ErrorBoundary fallback={<p>⚠️ Something went wrong. Please refresh.</p>}>
+            <Component {...pageProps} />
+          </ErrorBoundary>
           <ToastContainer
             position="top-right"
             autoClose={5000}
