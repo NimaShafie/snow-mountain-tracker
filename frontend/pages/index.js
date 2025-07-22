@@ -7,7 +7,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import MyLocationIcon from "@mui/icons-material/MyLocation";
 import Sidebar from "../components/Sidebar";
-import Map from "../components/Map";
+import dynamic from "next/dynamic";
 import MountainFilter from "../components/MountainFilter";
 import BookingSystem from "../components/BookingSystem";
 import Calendar from "../components/Dashboard";
@@ -45,6 +45,11 @@ const Home = () => {
 
   const [scrolled, setScrolled] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState(null);
+
+  const Map = dynamic(() => import("../components/Map"), {
+    ssr: false,
+    loading: () => <div style={{ height: "500px" }}>Loading map...</div>
+  });
 
   useEffect(() => {
     const fetchMountains = async () => {
