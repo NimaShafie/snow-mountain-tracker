@@ -20,6 +20,11 @@ import { useModalStore } from "../store/useModalStore";
 import { useRouter } from "next/router";
 import SearchBarWithAlerts from "../components/SearchBarWithAlerts";
 
+const Map = dynamic(() => import("../components/Map"), {
+    ssr: false,
+    loading: () => <div style={{ height: "500px" }}>Loading map...</div>
+});
+
 const Home = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [mountains, setMountains] = useState([]);
@@ -45,11 +50,6 @@ const Home = () => {
 
   const [scrolled, setScrolled] = useState(false);
   const [menuAnchor, setMenuAnchor] = useState(null);
-
-  const Map = dynamic(() => import("../components/Map"), {
-    ssr: false,
-    loading: () => <div style={{ height: "500px" }}>Loading map...</div>
-  });
 
   useEffect(() => {
     const fetchMountains = async () => {
@@ -79,7 +79,7 @@ const Home = () => {
       if (data.length > 0) {
         const { lat, lon } = data[0];
         setMapCenter({ lat: parseFloat(lat), lon: parseFloat(lon) });
-        setMapKey((prev) => prev + 1);
+        // setMapKey((prev) => prev + 1);
       } else {
         alert("Location not found.");
       }
@@ -93,7 +93,7 @@ const Home = () => {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setMapCenter({ lat: pos.coords.latitude, lon: pos.coords.longitude });
-        setMapKey((prev) => prev + 1);
+        // setMapKey((prev) => prev + 1);
       },
       () => alert("Permission denied.")
     );
@@ -273,7 +273,7 @@ const Home = () => {
                     if (data.length > 0) {
                       const { lat, lon } = data[0];
                       setMapCenter({ lat: parseFloat(lat), lon: parseFloat(lon) });
-                      setMapKey((prev) => prev + 1);
+                      // setMapKey((prev) => prev + 1);
                     } else {
                       alert("Location not found.");
                     }
@@ -285,7 +285,6 @@ const Home = () => {
             <Box sx={{ height: "calc(60vh)", borderRadius: 1, boxShadow: 8, position: "relative" }}>
               <MountainFilter filters={filters} setFilters={setFilters} />
               <Map
-                key={mapKey}
                 center={mapCenter}
                 filters={filters}
                 onMountainHover={handleMountainHover}
