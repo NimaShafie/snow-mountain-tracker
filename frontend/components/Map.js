@@ -16,7 +16,12 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
   const US_BOUNDS = [[-140, 10], [-50, 72]];
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_MAPBOX_API_KEY || mapInstance.current || !mapContainer.current) return;
+    if (
+      typeof window === "undefined" ||
+      !process.env.NEXT_PUBLIC_MAPBOX_API_KEY ||
+      mapInstance.current ||
+      !mapContainer.current
+    ) return;
 
     mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
 
@@ -68,12 +73,12 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
     fetch(`${baseUrl}/mountains`)
       .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
       .then(setMountains)
-      .catch(err => console.error("❌ Error fetching mountains:", err));
+      .catch(err => console.error("Error fetching mountains:", err));
 
     fetch(`${baseUrl}/road-closures`)
       .then(res => res.ok ? res.json() : Promise.reject(res.statusText))
       .then(setClosures)
-      .catch(err => console.error("❌ Road closures fetch failed:", err));
+      .catch(err => console.error("Road closures fetch failed:", err));
   }, []);
 
   useEffect(() => {
@@ -85,8 +90,8 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
       });
     }
 
-    if (!mapInstance.current || !mapContainer.current) {
-      console.warn("⚠️ Map not ready - skipping marker render");
+    if (typeof window === "undefined" || !mapInstance.current || !mapContainer.current) {
+      console.warn("map not ready — skipping marker render");
       return;
     }
 
@@ -156,8 +161,8 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
   }, [mountains, filters, lockedMountain]);
 
   useEffect(() => {
-    if (!mapReady || !mapInstance.current) {
-      console.warn("⏳ Map not ready — skipping closure render");
+    if (typeof window === "undefined" || !mapReady || !mapInstance.current) {
+      console.warn("map not ready — skipping closure render");
       return;
     }
 
@@ -202,12 +207,9 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
     }
   }, [center]);
 
-  if (!mapContainer.current) {
-    console.warn("❌ mapContainer is null — rendering skipped");
-    return null;
-  }
-
-  return <div ref={mapContainer} style={{ width: "100%", height: "81.3%" }} />;
+  return typeof window !== "undefined" ? (
+    <div ref={mapContainer} style={{ width: "100%", height: "81.3%" }} />
+  ) : null;
 };
 
 export default Map;
