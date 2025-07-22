@@ -9,15 +9,20 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
   const mapContainer = useRef(null);
   const mapInstance = useRef(null);
   const popupRef = useRef(null);
+  const [mapReady, setMapReady] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [mountains, setMountains] = useState([]);
   const [closures, setClosures] = useState([]);
-  const [mapReady, setMapReady] = useState(false);
 
   const US_BOUNDS = [[-140, 10], [-50, 72]];
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (
-      typeof window === "undefined" ||
+      !mounted ||
       !process.env.NEXT_PUBLIC_MAPBOX_API_KEY ||
       mapInstance.current ||
       !mapContainer.current
@@ -67,7 +72,7 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
       document.querySelectorAll(".mapboxgl-ctrl-bottom-left, .mapboxgl-ctrl-bottom-right")
         .forEach(el => el.style.display = "none");
     });
-  }, []);
+  }, [mounted]);
 
   useEffect(() => {
     fetch(`${baseUrl}/mountains`)
@@ -90,8 +95,8 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
       });
     }
 
-    if (typeof window === "undefined" || !mapInstance.current || !mapContainer.current) {
-      console.warn("map not ready — skipping marker render");
+    if (!mapReady || !mapInstance.current) {
+      console.warn("Map not ready — skipping marker render");
       return;
     }
 
@@ -158,11 +163,11 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
         onMountainHover(mountain);
       });
     });
-  }, [mountains, filters, lockedMountain]);
+  }, [mountains, filters, lockedMountain, mapReady]);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !mapReady || !mapInstance.current) {
-      console.warn("map not ready — skipping closure render");
+    if (!mapReady || !mapInstance.current) {
+      console.warn("Map not ready — skipping closure render");
       return;
     }
 
@@ -207,9 +212,7 @@ const Map = ({ center, filters, onMountainHover, onMountainSelect, lockedMountai
     }
   }, [center]);
 
-  return typeof window !== "undefined" ? (
-    <div ref={mapContainer} style={{ width: "100%", height: "81.3%" }} />
-  ) : null;
+  return <div ref={mapContainer} style={{ width: "100%", height: "81.3%" }} />;
 };
 
 export default Map;
