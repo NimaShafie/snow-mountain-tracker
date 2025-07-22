@@ -282,9 +282,10 @@ const Home = () => {
               }}
               onLocate={handleLocateMe}
             />
-            <Box key={mapKey} sx={{ height: "calc(60vh)", borderRadius: 1, boxShadow: 8, position: "relative" }}>
+            <Box sx={{ height: "calc(60vh)", borderRadius: 1, boxShadow: 8, position: "relative" }}>
               <MountainFilter filters={filters} setFilters={setFilters} />
               <Map
+                key={mapKey}
                 center={mapCenter}
                 filters={filters}
                 onMountainHover={handleMountainHover}
